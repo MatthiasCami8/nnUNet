@@ -22,6 +22,7 @@ from nnunet.network_architecture.initialization import InitWeights_He
 from nnunet.network_architecture.neural_network import SegmentationNetwork
 import torch.nn.functional
 import pdb
+import nnunet.config
 
 
 class ConvDropoutNormNonlin(nn.Module):
@@ -401,8 +402,11 @@ class Generic_UNet(SegmentationNetwork):
             x = torch.cat((x, skips[-(u + 1)]), dim=1)
             x = self.conv_blocks_localization[u](x)
             seg_outputs.append(self.final_nonlin(self.seg_outputs[u](x)))
-            pdb.set_trace()
+            #pdb.set_trace()
 
+        for i in len(seg_output):
+            torch.save(seg_output[i], f"{nnunet.config.filename}_{i}.pt")
+        
         if self._deep_supervision and self.do_ds:
             return tuple([seg_outputs[-1]] + [i(j) for i, j in
                                               zip(list(self.upscale_logits_ops)[::-1], seg_outputs[:-1][::-1])])
