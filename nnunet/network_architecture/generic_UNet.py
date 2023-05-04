@@ -404,7 +404,7 @@ class Generic_UNet(SegmentationNetwork):
             seg_outputs.append(self.final_nonlin(self.seg_outputs[u](x)))
             #pdb.set_trace()
 
-        for i in len(seg_outputs):
+        for i in range(len(seg_outputs)):
             torch.save(seg_outputs[i], f"{nnunet.config.filename}_{i}.pt")
         
         if self._deep_supervision and self.do_ds:
