@@ -208,7 +208,7 @@ def predict_cases(model, list_of_lists, output_filenames, folds, save_npz, num_t
     all_output_files = []
     for preprocessed in preprocessing:
         output_filename, (d, dct) = preprocessed
-        nnunet.config.filename = output_filename[-7]
+        nnunet.config.filename = output_filename[0:-7]
         all_output_files.append(all_output_files)
         if isinstance(d, str):
             data = np.load(d)
