@@ -23,7 +23,21 @@ from nnunet.network_architecture.neural_network import SegmentationNetwork
 import torch.nn.functional
 import pdb
 import nnunet.config
+from google.cloud import storage
+import os
 
+
+def upload_blob(bucket_name, source_file_name, destination_blob_name):
+  """Uploads a file to the bucket."""
+  storage_client = storage.Client()
+  bucket = storage_client.get_bucket(bucket_name)
+  blob = bucket.blob(destination_blob_name)
+
+  blob.upload_from_filename(source_file_name)
+
+#   print('File {} uploaded to {}.'.format(
+#       source_file_name,
+#       destination_blob_name))
 
 class ConvDropoutNormNonlin(nn.Module):
     """
@@ -389,6 +403,7 @@ class Generic_UNet(SegmentationNetwork):
     def forward(self, x):
         skips = []
         seg_outputs = []
+        print(f"Working on {nnunet.config.filename}")
         for d in range(len(self.conv_blocks_context) - 1):
             x = self.conv_blocks_context[d](x)
             skips.append(x)
@@ -401,11 +416,17 @@ class Generic_UNet(SegmentationNetwork):
             x = self.tu[u](x)
             x = torch.cat((x, skips[-(u + 1)]), dim=1)
             x = self.conv_blocks_localization[u](x)
+            torch.save(x, f"{nnunet.config.filename}_{u}.pt")
+            
+            upload_blob("picai_data", f"{nnunet.config.filename}_{u}.pt", f"preprocessed/original_correct/x/{(nnunet.config.filename).split('/')[-1]}_{u}.pt")
+            os.remove(f"{nnunet.config.filename}_{u}.pt")
             seg_outputs.append(self.final_nonlin(self.seg_outputs[u](x)))
             #pdb.set_trace()
 
         for i in range(len(seg_outputs)):
             torch.save(seg_outputs[i], f"{nnunet.config.filename}_{i}.pt")
+            upload_blob("picai_data", f"{nnunet.config.filename}_{i}.pt", f"preprocessed/original_correct/seg_outputs/{(nnunet.config.filename).split('/')[-1]}_{i}.pt")
+            os.remove(f"{nnunet.config.filename}_{i}.pt")
         
         if self._deep_supervision and self.do_ds:
             return tuple([seg_outputs[-1]] + [i(j) for i, j in
