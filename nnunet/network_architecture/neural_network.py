@@ -386,6 +386,7 @@ class SegmentationNetwork(NeuralNetwork):
                     predicted_patch = self._internal_maybe_mirror_and_pred_3D(
                         data[None, :, lb_x:ub_x, lb_y:ub_y, lb_z:ub_z], mirror_axes, do_mirroring,
                         gaussian_importance_map)[0]
+                    breakpoint()
 
                     if all_in_gpu:
                         predicted_patch = predicted_patch.half()
