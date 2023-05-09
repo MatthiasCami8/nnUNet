@@ -404,6 +404,7 @@ class Generic_UNet(SegmentationNetwork):
         skips = []
         seg_outputs = []
         print(f"Working on {nnunet.config.filename}")
+        breakpoint()
         for d in range(len(self.conv_blocks_context) - 1):
             x = self.conv_blocks_context[d](x)
             skips.append(x)
