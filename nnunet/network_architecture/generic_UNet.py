@@ -404,7 +404,6 @@ class Generic_UNet(SegmentationNetwork):
         skips = []
         seg_outputs = []
         print(f"Working on {nnunet.config.filename}")
-        breakpoint()
         for d in range(len(self.conv_blocks_context) - 1):
             x = self.conv_blocks_context[d](x)
             skips.append(x)
@@ -413,6 +412,7 @@ class Generic_UNet(SegmentationNetwork):
 
         x = self.conv_blocks_context[-1](x)
 
+        breakpoint()
         for u in range(len(self.tu)):
             x = self.tu[u](x)
             x = torch.cat((x, skips[-(u + 1)]), dim=1)
