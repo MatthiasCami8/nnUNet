@@ -412,7 +412,7 @@ class Generic_UNet(SegmentationNetwork):
 
         x = self.conv_blocks_context[-1](x)
 
-        breakpoint()
+        #breakpoint()
         for u in range(len(self.tu)):
             x = self.tu[u](x)
             x = torch.cat((x, skips[-(u + 1)]), dim=1)

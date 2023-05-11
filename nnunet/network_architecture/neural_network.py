@@ -382,7 +382,7 @@ class SegmentationNetwork(NeuralNetwork):
                     lb_z = z
                     ub_z = z + patch_size[2]
 
-                    breakpoint()
+                    #breakpoint()
                     predicted_patch = self._internal_maybe_mirror_and_pred_3D(
                         data[None, :, lb_x:ub_x, lb_y:ub_y, lb_z:ub_z], mirror_axes, do_mirroring,
                         gaussian_importance_map)[0]
@@ -480,7 +480,7 @@ class SegmentationNetwork(NeuralNetwork):
         data, slicer = pad_nd_image(x, min_size, pad_border_mode, pad_kwargs, True,
                                     self.input_shape_must_be_divisible_by)
 
-        breakpoint()
+        #breakpoint()
         predicted_probabilities = self._internal_maybe_mirror_and_pred_3D(data[None], mirror_axes, do_mirroring,
                                                                           None)[0]
 
