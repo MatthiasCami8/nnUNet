@@ -26,6 +26,8 @@ import nnunet.config
 from google.cloud import storage
 import os
 
+BUCKET = os.environ.get("BUCKET")
+ROOT_FOLDER = os.environ.get("ROOT_FOLDER")
 
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
   """Uploads a file to the bucket."""
@@ -34,10 +36,6 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
   blob = bucket.blob(destination_blob_name)
 
   blob.upload_from_filename(source_file_name)
-
-#   print('File {} uploaded to {}.'.format(
-#       source_file_name,
-#       destination_blob_name))
 
 class ConvDropoutNormNonlin(nn.Module):
     """
@@ -412,22 +410,19 @@ class Generic_UNet(SegmentationNetwork):
 
         x = self.conv_blocks_context[-1](x)
 
-        #breakpoint()
         for u in range(len(self.tu)):
             x = self.tu[u](x)
             x = torch.cat((x, skips[-(u + 1)]), dim=1)
             x = self.conv_blocks_localization[u](x)
             torch.save(x, f"{nnunet.config.filename}_{u}.pt")
             
-            print("I AM HERE")
-            upload_blob("picai_data", f"{nnunet.config.filename}_{u}.pt", f"preprocessed/tensors/settings_2/x/{(nnunet.config.filename).split('/')[-1]}_{u}.pt")
+            upload_blob(BUCKET, f"{nnunet.config.filename}_{u}.pt", f"{ROOT_FOLDER}/x/{(nnunet.config.filename).split('/')[-1]}_{u}.pt")
             os.remove(f"{nnunet.config.filename}_{u}.pt")
             seg_outputs.append(self.final_nonlin(self.seg_outputs[u](x)))
-            #pdb.set_trace()
 
         for i in range(len(seg_outputs)):
             torch.save(seg_outputs[i], f"{nnunet.config.filename}_{i}.pt")
-            upload_blob("picai_data", f"{nnunet.config.filename}_{i}.pt", f"preprocessed/tensors/settings_2/seg_outputs/{(nnunet.config.filename).split('/')[-1]}_{i}.pt")
+            upload_blob(BUCKET, f"{nnunet.config.filename}_{i}.pt", f"{ROOT_FOLDER}/seg_outputs/{(nnunet.config.filename).split('/')[-1]}_{i}.pt")
             os.remove(f"{nnunet.config.filename}_{i}.pt")
         
         if self._deep_supervision and self.do_ds:
