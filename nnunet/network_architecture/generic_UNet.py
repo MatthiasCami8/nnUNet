@@ -419,6 +419,7 @@ class Generic_UNet(SegmentationNetwork):
             x = self.conv_blocks_localization[u](x)
             torch.save(x, f"{nnunet.config.filename}_{u}.pt")
             
+            print("I AM HERE")
             upload_blob("picai_data", f"{nnunet.config.filename}_{u}.pt", f"preprocessed/tensors/settings_2/x/{(nnunet.config.filename).split('/')[-1]}_{u}.pt")
             os.remove(f"{nnunet.config.filename}_{u}.pt")
             seg_outputs.append(self.final_nonlin(self.seg_outputs[u](x)))
